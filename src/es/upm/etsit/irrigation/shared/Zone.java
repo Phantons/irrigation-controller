@@ -5,15 +5,21 @@ import java.io.Serializable;
 public class Zone implements Serializable {
   private static final long serialVersionUID = 2L;
   
+  private final String name;
   private final int pinAddress;
   private Schedule schedule;
-  private boolean shouldTakeWeather;
-  private boolean isWatering;
+  private boolean shouldTakeWeather = false;
+  private boolean isWatering = false;
   
-  public Zone(int _pinAddress) {
+  public Zone(String _name, int _pinAddress) {
+    name = _name;
     pinAddress = _pinAddress;
   }
 
+  public String getName() {
+    return name;
+  }
+  
   public int getPinAddress() {
     return pinAddress;
   }

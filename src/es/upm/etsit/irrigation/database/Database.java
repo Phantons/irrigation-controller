@@ -15,6 +15,8 @@ import org.apache.logging.log4j.Logger;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import es.upm.etsit.irrigation.exceptions.ConnectionException;
+import es.upm.etsit.irrigation.shared.Schedule;
+import main.java.com.telecobets.database.DBStatements;
 
 public class Database {
   private static final Logger logger = LogManager.getLogger(Database.class.getName());
@@ -82,7 +84,21 @@ public class Database {
   public static void checkDatabase(Connection conn) {
     
     try {
+      // Mode
+      PreparedStatement stmt = conn.prepareStatement(preparedStatements.get(DBStatements.MAIN_CR_MODES));
+      stmt.execute();
       
+      // Zones
+      stmt = conn.prepareStatement(preparedStatements.get(DBStatements.MAIN_CR_ZONES));
+      stmt.execute();
+      
+      // Days
+      stmt = conn.prepareStatement(preparedStatements.get(DBStatements.MAIN_CR_DAYS));
+      stmt.execute();
+      
+      // Schedule
+      stmt = conn.prepareStatement(preparedStatements.get(DBStatements.MAIN_CR_SCHEDULES));
+      stmt.execute();
       
     } catch (SQLException e) {
       logger.throwing(e);
@@ -166,6 +182,58 @@ public class Database {
    * doesn't exist in the map variable you must create it with an appropriate name
    */
   private static void DoPrepareStatements() {
+    preparedStatements.put(DBStatements.MAIN_CR_MODES, "CREATE TABLE IF NOT EXISTS `modes` ("
+        + "`ID` int not null AUTO_INCREMENT,"
+        + "`name` varchar(150) not null default '',"
+        + "PRIMARY KEY (`ID`, `name`)) DEFAULT CHARSET=UTF8");
     
+    preparedStatements.put(DBStatements.MAIN_CR_ZONES, "CREATE TABLE IF NOT EXISTS `zones` ("
+        + "`pinAddress` int not null,"
+        + "`modeID` int not null,"
+        + "`name` varchar(150) not null default '',"
+        + "`shouldTakeWeather` boolean not null default '0',"
+        + "PRIMARY KEY(`pinAddress`, `modeID`)) DEFAULT CHARSET=UTF8");
+    
+    preparedStatements.put(DBStatements.MAIN_CR_DAYS, "CREATE TABLE IF NOT EXISTS `days` ("
+        + "`zoneID` int not null,"
+        + "`monday` boolean not null default '0',"
+        + "`tuesday` boolean not null default '0',"
+        + "`wednesday` boolean not null default '0',"
+        + "`thursday` boolean not null default '0',"
+        + "`friday` boolean not null default '0',"
+        + "`saturday` boolean not null default '0',"
+        + "`sunday` boolean not null default '0',"
+        + "PRIMARY KEY(`zoneID`)) DEFAULT CHARSET=UTF8");
+    
+    preparedStatements.put(DBStatements.MAIN_CR_SCHEDULES, "CREATE TABLE IF NOT EXISTS `schedules` ("
+        + "`zoneID` int not null,"
+        + "`startHour` int not null,"
+        + "`startMinute` int not null,"
+        + "`timeout` signed bigint not null,"
+        + "PRIMARY KEY(`zoneID`, `startHour`, `startMinute`)) DEFAULT CHARSET=UTF8");
+    
+    
+    preparedStatements.put(DBStatements.MAIN_SEL_MODES, "SELECT ID, name FROM `modes`");
+    preparedStatements.put(DBStatements.MAIN_SEL_ZONES_BY_MODE_ID, "SELECT pinAddress, name, shouldTakeWeather FROM `zones` WHERE `modeID`=?");
+    preparedStatements.put(DBStatements.MAIN_SEL_DAYS_BY_ZONE_ID, "SELECT monday, tuesday, wednesday, thursday, friday, saturday, sunday FROM `days` WHERE `zoneID`=?");
+    preparedStatements.put(DBStatements.MAIN_SEL_SCHEDULES_BY_ZONE_ID, "SELECT startHour, startMinute, timeout FROM `schedules` WHERE `zoneID`=?");
+
+    preparedStatements.put(DBStatements.MAIN_INS_MODE, "INSERT INTO `modes` "
+        + "(name) VALUES (?)");
+    preparedStatements.put(DBStatements.MAIN_INS_ZONE, "INSERT INTO `zones` "
+        + "(pinAddress, modeID, name, shouldTakeWeather) VALUES (?,?,?,?)");
+    preparedStatements.put(DBStatements.MAIN_INS_DAYS, "INSERT INTO `days` "
+        + "(zoneID, monday, tuesday, wednesday, thursday, friday, saturday, sunday) VALUES (?,?,?,?,?,?,?,?)");
+    preparedStatements.put(DBStatements.MAIN_INS_SCHEDULES, "INSERT INTO `days` "
+        + "(zoneID, startHour, startMinute, timeout) VALUES (?,?,?,?)");
+    
+    preparedStatements.put(DBStatements.MAIN_DEL_MODE, "DELETE FROM `modes` "
+        + "WHERE `name` = ?");
+    preparedStatements.put(DBStatements.MAIN_DEL_ZONES_BY_MODE_ID, "DELETE FROM `zones` "
+        + "WHERE `modeID` = ?");
+    preparedStatements.put(DBStatements.MAIN_DEL_DAYS_BY_ZONE_ID, "DELETE FROM `days` "
+        + "WHERE `zoneID` = ?");
+    preparedStatements.put(DBStatements.MAIN_DEL_SCHEDULES_BY_ZONE_ID, "DELETE FROM `schedules` "
+        + "WHERE `zoneID` = ?");
   }
 }

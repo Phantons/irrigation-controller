@@ -8,17 +8,26 @@ public class Mode implements Serializable {
   private static final long serialVersionUID = 2L;
   
   
-  private final int ID;
+  private transient int ID;
+  private final String name;
   private List<Zone> zones = new ArrayList<Zone>();
-  private boolean isActive = false;
   
-  public Mode(int _ID) {
+  
+  public Mode(int _ID, String _name) {
     ID = _ID;
+    name = _name;
   }
-  
   
   public int getID() {
     return ID;
+  }
+  
+  public void setID(int _ID) {
+    ID = _ID;
+  }
+  
+  public String getName() {
+    return name;
   }
 
 
@@ -36,21 +45,4 @@ public class Mode implements Serializable {
   public void setZones(List<Zone> zones) {
     this.zones = zones;
   }
-
-
-  /**
-   * @return the isActive
-   */
-  public boolean isActive() {
-    return isActive;
-  }
-
-
-  /**
-   * @param isActive the isActive to set
-   */
-  public void setActive(boolean isActive) {
-    this.isActive = isActive;
-  }
-  
 }

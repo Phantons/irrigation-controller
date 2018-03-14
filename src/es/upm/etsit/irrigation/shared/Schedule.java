@@ -11,11 +11,11 @@ import es.upm.etsit.irrigation.util.Time;
 public class Schedule implements Serializable {
   private static final long serialVersionUID = 2L;
   
-  private List<DayOfWeek> days = new ArrayList<DayOfWeek>();
+  private boolean[] days = new boolean[DayOfWeek.DAYS_OF_WEEK];
   private List<Time> irrigationCycles = new ArrayList<Time>();
   
   
-  public Schedule(List<DayOfWeek> _days, List<Time> _irrigationCycles) {
+  public Schedule(boolean[] _days, List<Time> _irrigationCycles) {
     days = _days;
     irrigationCycles = _irrigationCycles;
   }
@@ -26,14 +26,23 @@ public class Schedule implements Serializable {
     int minute = now.get(Calendar.MINUTE);
     
     for (Time irrigationCycle : irrigationCycles) {
-      if (irrigationCycle.isBetween(hour, minute)) {
-        for (DayOfWeek day : days) {
-          if (day.getID() == today)
-            return irrigationCycle.getTimeout();
-        }
+      if (irrigationCycle.isBetween(hour, minute) && isDaySelected(today)) {
+        return irrigationCycle.getTimeout();
       }
     }
     
     return 0;
+  }
+  
+  public boolean isDaySelected(int _day) {
+    return days[_day];
+  }
+  
+  public boolean isDaySelected(DayOfWeek _day) {
+    return isDaySelected(_day.getID());
+  }
+  
+  public List<Time> getIrrigationCycles() {
+    return irrigationCycles;
   }
 }
