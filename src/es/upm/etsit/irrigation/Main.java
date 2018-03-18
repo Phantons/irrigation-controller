@@ -13,11 +13,13 @@ import org.threeten.bp.LocalTime;
 
 import es.upm.etsit.irrigation.database.DBStatements;
 import es.upm.etsit.irrigation.database.Database;
+import es.upm.etsit.irrigation.exceptions.ConnectionException;
 import es.upm.etsit.irrigation.shared.Mode;
 import es.upm.etsit.irrigation.shared.Schedule;
 import es.upm.etsit.irrigation.shared.Zone;
 import es.upm.etsit.irrigation.socket.SocketHandler;
 import es.upm.etsit.irrigation.util.DayOfWeek;
+import es.upm.etsit.irrigation.util.LocalTime;
 import es.upm.etsit.irrigation.util.Time;
 
 public class Main {
@@ -33,12 +35,35 @@ public class Main {
   
   private static Controller controller;
   
+  private static final String USER = "ELCO";
+  private static final String PASSWORD = "ELCO";
   public static void main(String[] args) {
     // Init connections
 
     // get location
     
     // load database
+    try {
+      Database.init(USER, PASSWORD);
+    } catch (ConnectionException e) {
+      logger.throwing(e);
+    }
+    
+    
+    Connection conn = null;
+    
+    try {
+      conn = Database.getConnection();
+    } catch (SQLException e) {
+      logger.throwing(e);
+    }
+    
+    if (conn == null)
+      System.exit(0);
+    
+    Database.checkDatabase(conn);
+    Database.closeConnection(conn);
+    
     try {
       loadDatabase();
     } catch (SQLException e) {

@@ -15,8 +15,6 @@ import org.apache.logging.log4j.Logger;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import es.upm.etsit.irrigation.exceptions.ConnectionException;
-import es.upm.etsit.irrigation.shared.Schedule;
-import main.java.com.telecobets.database.DBStatements;
 
 public class Database {
   private static final Logger logger = LogManager.getLogger(Database.class.getName());
@@ -36,7 +34,7 @@ public class Database {
   }
   
   public static boolean init (String _user, String _password) throws ConnectionException {
-    DB_CONNECTION = DB_CONNECTION + System.getProperty("user.home") + "/maindb_"; 
+    DB_CONNECTION = DB_CONNECTION + System.getProperty("user.home") + "/maindb"; 
     
     try {
       Class.forName(DB_DRIVER);

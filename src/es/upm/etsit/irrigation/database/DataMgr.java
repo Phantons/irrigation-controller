@@ -5,10 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,12 +14,6 @@ import es.upm.etsit.irrigation.shared.Schedule;
 import es.upm.etsit.irrigation.shared.Zone;
 import es.upm.etsit.irrigation.util.DayOfWeek;
 import es.upm.etsit.irrigation.util.Time;
-import main.java.com.telecobets.analizer.Arbitrage;
-import main.java.com.telecobets.analizer.settings.filter.Filter;
-import main.java.com.telecobets.analizer.stats.StatsType;
-import main.java.com.telecobets.database.Account;
-import main.java.com.telecobets.database.DBStatements;
-import main.java.com.telecobets.database.Database;
 
 public class DataMgr {
   private static final Logger logger = LogManager.getLogger(DataMgr.class.getName());
