@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.threeten.bp.LocalTime;
 
 import es.upm.etsit.irrigation.database.DBStatements;
 import es.upm.etsit.irrigation.database.Database;

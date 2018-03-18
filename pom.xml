@@ -43,11 +43,6 @@
     	<version>2.10.0</version>
     </dependency>
 	<!-- https://mvnrepository.com/artifact/com.jakewharton.threetenabp/threetenabp -->
-	<dependency>
-		<groupId>com.jakewharton.threetenabp</groupId>
-		<artifactId>threetenabp</artifactId>
-		<version>1.0.5</version>
-	</dependency>
   </dependencies>
   <build>
     <sourceDirectory>src</sourceDirectory>
