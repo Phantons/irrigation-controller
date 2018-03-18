@@ -36,6 +36,10 @@ public class Main {
   
   private static final String USER = "ELCO";
   private static final String PASSWORD = "ELCO";
+  
+  // TODO: Move this to a external file
+  private static final String RASPI_ID = "ELCORASPI";
+  
   public static void main(String[] args) {
     // Init connections
 
@@ -73,13 +77,13 @@ public class Main {
     while (true) {
       if (System.currentTimeMillis() > updateTime) {
         // Ask new mode if exists.
-        Mode newMode = SocketHandler.askMode();
+        Mode newMode = SocketHandler.askMode(RASPI_ID);
         if (newMode != null) {
           controller.setNewActiveMode(newMode);
         }
         
         // Ask if some zone should irrigate now
-        Integer[] portIrrigationTimes = SocketHandler.shouldIrrigateNow();
+        Integer[] portIrrigationTimes = SocketHandler.shouldIrrigateNow(RASPI_ID);
         for (int i = 0; i < portIrrigationTimes.length; i++) {
           Integer time = portIrrigationTimes[i];
           if (time != null && time > 0) {
@@ -88,7 +92,7 @@ public class Main {
         }
         
         // Send current port status
-        SocketHandler.sendPortStatus(controller.getCurrentZoneStatus());
+        SocketHandler.sendPortStatus(RASPI_ID, controller.getCurrentZoneStatus());
         
         updateTime = System.currentTimeMillis() + UPDATE_TIME;
       }

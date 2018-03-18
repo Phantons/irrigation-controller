@@ -1,18 +1,43 @@
 package es.upm.etsit.irrigation.socket;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import es.upm.etsit.irrigation.shared.Mode;
+
 public class SocketHandler {
+  private static final Logger logger = LogManager.getLogger(SocketHandler.class.getName());
 
   
-  public static byte[] askMode(String identificador) {
+  public static Mode askMode(String identificador) {
     String respuesta = Comunicaciones.consultarAlServidor("/ActMd/" + identificador + "/", 1)[0];
-    if(respuesta != null){
-    	if(respuesta.equals("IdFalso")){
-    		return new byte[0];
+    if(respuesta != null) {
+    	if(respuesta.equals("IdFalso")) {
+    		return null;
     	}
+    	
     	byte[] modoSerializado = DatatypeConverter.parseHexBinary(respuesta);
-    	return modoSerializado;
+    	
+      try {
+        ByteArrayInputStream dataInputStream = new ByteArrayInputStream(modoSerializado);
+        ObjectInputStream is = new ObjectInputStream(dataInputStream);
+        Mode currentMode = (Mode) is.readObject();
+        
+        return currentMode;
+      } catch (IOException e) {
+        logger.throwing(e);
+      } catch (ClassNotFoundException e) {
+        logger.throwing(e);
+      }
+      
+    	return null;
     }
+    
     return null;
   }
   
@@ -37,9 +62,9 @@ public class SocketHandler {
     return null;
   }
   
-  public static void sendPortStatus(Boolean[] status, String identificador) {
+  public static void sendPortStatus(String identificador, Boolean[] status) {
     String peticion = "/InfRg/" + identificador + "/";
-    for(int j1 = 0; j1 < 32; j1 = j1 + 1){
+    for(int j1 = 0; j1 < status.length; j1 = j1 + 1) {
     	if(status[j1] != null){
     		peticion = peticion + Boolean.toString(status[j1]) + "/";
     	}
