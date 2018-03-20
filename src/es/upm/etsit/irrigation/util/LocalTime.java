@@ -61,15 +61,9 @@
  */
 package es.upm.etsit.irrigation.util;
 
-import static java.time.temporal.ChronoField.HOUR_OF_DAY;
-import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
-import static java.time.temporal.ChronoField.NANO_OF_SECOND;
-import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
-
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.time.temporal.ChronoField;
 
 /**
  * A time without time-zone in the ISO-8601 calendar system,
@@ -220,11 +214,16 @@ public final class LocalTime
      * @throws DateTimeException if the value of any field is out of range
      */
     public static LocalTime of(int hour, int minute) {
-        HOUR_OF_DAY.checkValidValue(hour);
+        if (hour < 0 || hour > 23)
+          return null;
+        
         if (minute == 0) {
             return HOURS[hour];  // for performance
         }
-        MINUTE_OF_HOUR.checkValidValue(minute);
+        
+        if (minute < 0 || minute > 59)
+          return null;
+        
         return new LocalTime(hour, minute, 0, 0);
     }
 
@@ -314,7 +313,10 @@ public final class LocalTime
         if (this.hour == hour) {
             return this;
         }
-        HOUR_OF_DAY.checkValidValue(hour);
+
+        if (hour < 0 || hour > 23)
+          return null;
+        
         return create(hour, minute, second, nano);
     }
 
@@ -331,7 +333,10 @@ public final class LocalTime
         if (this.minute == minute) {
             return this;
         }
-        MINUTE_OF_HOUR.checkValidValue(minute);
+
+        if (minute < 0 || minute > 59)
+          return null;
+        
         return create(hour, minute, second, nano);
     }
 
@@ -348,7 +353,10 @@ public final class LocalTime
         if (this.second == second) {
             return this;
         }
-        SECOND_OF_MINUTE.checkValidValue(second);
+
+        if (second < 0 || second > 59)
+          return null;
+        
         return create(hour, minute, second, nano);
     }
 
@@ -365,7 +373,10 @@ public final class LocalTime
         if (this.nano == nanoOfSecond) {
             return this;
         }
-        NANO_OF_SECOND.checkValidValue(nanoOfSecond);
+
+        if (nanoOfSecond < 0 || nanoOfSecond > 999999999)
+          return null;
+        
         return create(hour, minute, second, nanoOfSecond);
     }
 
