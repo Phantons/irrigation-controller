@@ -14,8 +14,8 @@ public class SocketHandler {
   private static final Logger logger = LogManager.getLogger(SocketHandler.class.getName());
 
   
-  public static Mode askMode(String identificador) {
-    String respuesta = Comunicaciones.consultarAlServidor("/ActMd/" + identificador + "/", 1)[0];
+  public static ControladorDeManu askController(String identificador) {
+    String respuesta = Comunicaciones.consultarAlServidor("/AskCo/" + identificador + "/", 1)[0];
     if(respuesta != null) {
     	if(respuesta.equals("IdFalso")) {
     		return null;
@@ -26,9 +26,9 @@ public class SocketHandler {
       try {
         ByteArrayInputStream dataInputStream = new ByteArrayInputStream(modoSerializado);
         ObjectInputStream is = new ObjectInputStream(dataInputStream);
-        Mode currentMode = (Mode) is.readObject();
+        ControladorDeManu controller = (ControladorDeManu) is.readObject();
         
-        return currentMode;
+        return controller;
       } catch (IOException e) {
         logger.throwing(e);
       } catch (ClassNotFoundException e) {
