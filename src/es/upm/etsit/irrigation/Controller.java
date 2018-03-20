@@ -20,15 +20,24 @@ public class Controller {
   private final int MAX_ZONES = 32;
   
   private Mode mode;
+  
+  // It's a identifier for each town/village in AEMET opendata.
+  private int location;
+  
   final GpioController gpio = GpioFactory.getInstance();
   
   private Map<Zone, GpioPinDigitalOutput> zonesPin = new HashMap<Zone, GpioPinDigitalOutput>();
   
   public Controller(Mode _mode) {
     setNewActiveMode(_mode);
+    location = -1;
   }
   
   public void checkAndStartIrrigationCycles() {
+    // Safety check
+    if (mode == null)
+      return;
+    
     Calendar now = GregorianCalendar.getInstance();
     now.setTimeInMillis(System.currentTimeMillis());
     
@@ -74,14 +83,17 @@ public class Controller {
     zonesPin.clear();
     
     DataMgr.removeMode(mode);
+    
     mode = newMode;
     
-    // Make pins for zones.
-    for(Zone zone : mode.getZones()) {
-      makePin(zone);
+    if (newMode != null) {
+      // Make pins for zones.
+      for(Zone zone : mode.getZones()) {
+        makePin(zone);
+      }
+      
+      DataMgr.addModeToDB(newMode); 
     }
-    
-    DataMgr.addModeToDB(newMode);
   }
   
   public Zone getZoneByPinAddress(int pin) {
@@ -107,5 +119,13 @@ public class Controller {
     }
     
     return isWateringZone;
+  }
+
+  public int getLocation() {
+    return location;
+  }
+
+  public void setLocation(int location) {
+    this.location = location;
   }
 }

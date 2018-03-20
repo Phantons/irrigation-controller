@@ -32,6 +32,10 @@ public class Main {
   private final static long UPDATE_TIME = 60000;
   private static long updateTime = 0;
   
+  // 1 hour
+  private final static long WEATHER_TIME = 60000*60;
+  private static long weatherTime = 0;
+  
   private static Controller controller;
   
   private static final String USER = "ELCO";
@@ -41,10 +45,6 @@ public class Main {
   private static final String RASPI_ID = "ELCORASPI";
   
   public static void main(String[] args) {
-    // Init connections
-
-    // get location
-    
     // load database
     try {
       Database.init(USER, PASSWORD);
@@ -67,12 +67,18 @@ public class Main {
     Database.checkDatabase(conn);
     Database.closeConnection(conn);
     
+    Mode mode = null;
     try {
-      loadDatabase();
+      mode = loadDatabase();
     } catch (SQLException e) {
       logger.throwing(e);
     }
-
+    
+    controller = new Controller(mode);
+    
+    // get location
+    //controller.setLocation(SocketHandler.askLocation(RASPI_ID));
+    
     // loop
     while (true) {
       if (System.currentTimeMillis() > updateTime) {
@@ -97,6 +103,13 @@ public class Main {
         updateTime = System.currentTimeMillis() + UPDATE_TIME;
       }
       
+      if (System.currentTimeMillis() > weatherTime) {
+        Thread thread = new Thread_GetWeather(controller.getLocation());
+        thread.start();
+        
+        weatherTime = System.currentTimeMillis() + WEATHER_TIME;
+      }
+      
       
       controller.checkAndStartIrrigationCycles();
       controller.checkInactivePorts();
@@ -105,8 +118,7 @@ public class Main {
     }
   }
   
-  
-  private static void loadDatabase() throws SQLException {
+  private static Mode loadDatabase() throws SQLException {
     Connection conn = Database.getConnection();
     PreparedStatement stmt = null;
     ResultSet result = null;
@@ -163,8 +175,7 @@ public class Main {
       
     }
     
-    
-    controller = new Controller(mode);
+    return mode;
   }
   
   
