@@ -8,13 +8,13 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import es.upm.etsit.irrigation.shared.Mode;
+import es.upm.etsit.irrigation.shared.Controlador;
 
 public class SocketHandler {
   private static final Logger logger = LogManager.getLogger(SocketHandler.class.getName());
 
   
-  public static ControladorDeManu askController(String identificador) {
+  public static Controlador askController(String identificador) {
     String respuesta = Comunicaciones.consultarAlServidor("/AskCo/" + identificador + "/", 1)[0];
     if(respuesta != null) {
     	if(respuesta.equals("IdFalso")) {
@@ -26,7 +26,7 @@ public class SocketHandler {
       try {
         ByteArrayInputStream dataInputStream = new ByteArrayInputStream(modoSerializado);
         ObjectInputStream is = new ObjectInputStream(dataInputStream);
-        ControladorDeManu controller = (ControladorDeManu) is.readObject();
+        Controlador controller = (Controlador) is.readObject();
         
         return controller;
       } catch (IOException e) {
