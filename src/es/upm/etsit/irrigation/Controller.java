@@ -43,7 +43,8 @@ public class Controller {
     
     for (Zone zone : mode.getZones()) {
       long timeout = 0;
-      if (!zone.isWatering() && (timeout = zone.getSchedule().isTimeForIrrigation(now)) > 0) {
+      if (!zone.isWatering() && (timeout = zone.getSchedule().isTimeForIrrigation(now)) > 0 &&
+          Weather.shouldIrrigateNow()) {
         activeElectrovalve(zone, timeout*MILLISECONDS);
       }
     }
