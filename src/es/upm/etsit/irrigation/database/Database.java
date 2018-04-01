@@ -207,7 +207,7 @@ public class Database {
         + "`zoneID` int not null,"
         + "`startHour` int not null,"
         + "`startMinute` int not null,"
-        + "`timeout` signed bigint not null,"
+        + "`timeout` bigint not null,"
         + "PRIMARY KEY(`zoneID`, `startHour`, `startMinute`)) DEFAULT CHARSET=UTF8");
     
     
