@@ -110,7 +110,7 @@ public class Controller {
     
     // Set all array to null
     for (int i = 0; i < isWateringZone.length; i++) {
-      isWateringZone = null;
+      isWateringZone[i] = null;
     }
     
     // Update it with current pins.

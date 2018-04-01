@@ -19,6 +19,10 @@ public class DataMgr {
   private static final Logger logger = LogManager.getLogger(DataMgr.class.getName());
   
   public static void addModeToDB(final Mode mode) {
+    // Safety check
+    if (mode == null)
+      return;
+    
     PreparedStatement stmt;
     Connection conn = null;
     try {
@@ -77,6 +81,11 @@ public class DataMgr {
   }
   
   public static void removeMode(final Mode mode) {
+    
+    // Safety check
+    if (mode == null)
+      return;
+    
     Thread dbController = new Thread("DBController") {
       public void run() {
         Connection conn = null;
