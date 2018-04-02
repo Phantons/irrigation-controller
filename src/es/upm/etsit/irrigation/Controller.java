@@ -90,7 +90,23 @@ public class Controller {
     if (newMode != null) {
       // Make pins for zones.
       for(Zone zone : mode.getZones()) {
-        makePin(zone);
+        logger.trace("Added new zone " + zone.getPinAddress());
+        
+        GpioPin gpioPin = gpio.getProvisionedPin(RaspiPin.getPinByAddress(zone.getPinAddress()));
+        if (gpioPin != null) {
+          if (gpioPin instanceof GpioPinDigitalOutput) {
+            GpioPinDigitalOutput pin = (GpioPinDigitalOutput) gpioPin;
+            zonesPin.put(zone, pin);
+            
+          } else {
+            logger.error("Pin is not output but exists. Reset gpio");
+            gpio.shutdown();
+            gpio = GpioFactory.getInstance();
+            setNewActiveMode(newMode);
+          }
+          
+        } else
+          makePin(zone);
       }
       
       DataMgr.addModeToDB(newMode); 
