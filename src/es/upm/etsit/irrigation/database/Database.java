@@ -34,7 +34,8 @@ public class Database {
   }
   
   public static boolean init (String _user, String _password) throws ConnectionException {
-    DB_CONNECTION = DB_CONNECTION + System.getProperty("user.home") + "/maindb"; 
+    DB_CONNECTION = DB_CONNECTION + System.getProperty("user.home") + "/maindb";
+    logger.trace("Saving DB in [{}]", System.getProperty("user.home"));
     
     try {
       Class.forName(DB_DRIVER);
@@ -226,7 +227,7 @@ public class Database {
         + "(zoneID, startHour, startMinute, timeout) VALUES (?,?,?,?)");
     
     preparedStatements.put(DBStatements.MAIN_DEL_MODE, "DELETE FROM `modes` "
-        + "WHERE `name` = ?");
+        + "WHERE `ID` = ?");
     preparedStatements.put(DBStatements.MAIN_DEL_ZONES_BY_MODE_ID, "DELETE FROM `zones` "
         + "WHERE `modeID` = ?");
     preparedStatements.put(DBStatements.MAIN_DEL_DAYS_BY_ZONE_ID, "DELETE FROM `days` "

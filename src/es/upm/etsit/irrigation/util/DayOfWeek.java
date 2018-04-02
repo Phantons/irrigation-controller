@@ -1,16 +1,15 @@
 package es.upm.etsit.irrigation.util;
 
 public enum DayOfWeek {
-  SUNDAY(1),
-  MONDAY(2),
-  TUESDAY(3),
-  WEDNESDAY(4),
-  THURSDAY(5),
-  FRIDAY(6),
-  SATURDAY(7);
+  MONDAY(0),
+  TUESDAY(1),
+  WEDNESDAY(2),
+  THURSDAY(3),
+  FRIDAY(4),
+  SATURDAY(5),
+  SUNDAY(6);
   
   private int ID;
-  public static final int DAYS_OF_WEEK = 7;
   
   DayOfWeek(int _id) {
     ID = _id;
@@ -18,5 +17,12 @@ public enum DayOfWeek {
   
   public int getID() {
     return ID;
+  }
+  
+  public static DayOfWeek getFromID(int id) {
+    for (DayOfWeek day : DayOfWeek.values())
+      if (day.getID() == id)
+        return day;
+    return null;
   }
 }

@@ -21,6 +21,7 @@ import es.upm.etsit.irrigation.socket.SocketHandler;
 import es.upm.etsit.irrigation.util.DayOfWeek;
 import es.upm.etsit.irrigation.util.LocalTime;
 import es.upm.etsit.irrigation.util.Time;
+import es.upm.etsit.irrigation.util.Util;
 
 public class Main {
   
@@ -32,6 +33,10 @@ public class Main {
   // 1 min
   private final static long UPDATE_TIME = 60000;
   private static long updateTime = 0;
+  
+  // 15 minutes
+  private final static long SENSOR_TIME = 15*60000;
+  private static long sensorTime = 0; 
   
   // 1 hour
   private final static long WEATHER_TIME = 60000*60;
@@ -66,14 +71,15 @@ public class Main {
       System.exit(0);
     
     Database.checkDatabase(conn);
-    Database.closeConnection(conn);
     
     Mode mode = null;
     try {
-      mode = loadDatabase();
+      mode = loadDatabase(conn);
     } catch (SQLException e) {
       logger.throwing(e);
     }
+    
+    Database.closeConnection(conn);
     
     controller = new Controller(mode);
     
@@ -85,6 +91,11 @@ public class Main {
         // Ask new mode if exists.
         Controlador newController = SocketHandler.askController(RASPI_ID);
         if (newController != null) {
+          logger.trace("Added new controller");
+          
+          // DEBUG
+          Util.printMode(newController.getActiveMode());
+          
           controller.setNewActiveMode(newController.getActiveMode());
           // controller.setLocation(newController.getMunicipio());
         }
@@ -111,6 +122,11 @@ public class Main {
         weatherTime = System.currentTimeMillis() + WEATHER_TIME;
       }
       
+      if (System.currentTimeMillis() > sensorTime) {
+        
+        sensorTime = System.currentTimeMillis() + SENSOR_TIME;
+      }
+      
       
       controller.checkAndStartIrrigationCycles();
       controller.checkInactivePorts();
@@ -119,8 +135,7 @@ public class Main {
     }
   }
   
-  private static Mode loadDatabase() throws SQLException {
-    Connection conn = Database.getConnection();
+  private static Mode loadDatabase(Connection conn) throws SQLException {
     PreparedStatement stmt = null;
     ResultSet result = null;
     
@@ -131,10 +146,13 @@ public class Main {
     Mode mode = null;
     // Only if we have any mode load it.
     if (result.next()) {
+      logger.trace("There is a mode saved in DB");
+      
       int ID = result.getInt("ID");
       String name = result.getString("name");
       
      mode = new Mode(ID, name);
+     logger.trace("Mode id [{}] and name [{}]", ID, name);
      
      stmt = conn.prepareStatement(Database.getPreparedStatement(DBStatements.MAIN_SEL_ZONES_BY_MODE_ID));
      stmt.setInt(1, mode.getID());
@@ -145,6 +163,7 @@ public class Main {
        String zoneName = result.getString("name");
        boolean shouldTakeWeather = result.getBoolean("shouldTakeWeather");
        
+       logger.trace("Zone [{}, {}]",pinAddress, zoneName);
        Zone zone = new Zone(zoneName, pinAddress);
        zone.setShouldTakeWeather(shouldTakeWeather);
        mode.getZones().add(zone);
@@ -154,9 +173,10 @@ public class Main {
        ResultSet result2 = stmt2.executeQuery();
        result2.next();
        
-       boolean[] days = new boolean[DayOfWeek.DAYS_OF_WEEK];
-       for (int i = 0; i < DayOfWeek.DAYS_OF_WEEK; i++) {
+       boolean[] days = new boolean[DayOfWeek.values().length];
+       for (int i = 0; i < DayOfWeek.values().length; i++) {
          days[i] = result2.getBoolean(i);
+         logger.trace("Day [{}] is {}", DayOfWeek.getFromID(i), days[i]);
        }
        
        stmt2 = conn.prepareStatement(Database.getPreparedStatement(DBStatements.MAIN_SEL_SCHEDULES_BY_ZONE_ID));
@@ -176,7 +196,10 @@ public class Main {
        Schedule schedule = new Schedule(days, irrigationCycle);
        zone.setSchedule(schedule);
        
+       
      }
+    } else {
+      logger.trace("No mode in DB");
     }
     
     return mode;

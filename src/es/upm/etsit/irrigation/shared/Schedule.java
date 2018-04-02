@@ -11,7 +11,7 @@ import es.upm.etsit.irrigation.util.Time;
 public class Schedule implements Serializable {
   private static final long serialVersionUID = 2L;
   
-  private boolean[] days = new boolean[DayOfWeek.DAYS_OF_WEEK];
+  private boolean[] days = new boolean[DayOfWeek.values().length];
   private List<Time> irrigationCycles = new ArrayList<Time>();
   
   
@@ -35,6 +35,9 @@ public class Schedule implements Serializable {
   }
   
   public boolean isDaySelected(int _day) {
+    if (_day < 0 || _day > days.length)
+      return false;
+    
     return days[_day];
   }
   

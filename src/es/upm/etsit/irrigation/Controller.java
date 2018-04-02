@@ -5,8 +5,12 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
+import com.pi4j.io.gpio.GpioPin;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
@@ -16,6 +20,8 @@ import es.upm.etsit.irrigation.shared.Mode;
 import es.upm.etsit.irrigation.shared.Zone;
 
 public class Controller {
+  private final Logger logger = LogManager.getLogger(this.getClass().getName());
+  
   private final long MILLISECONDS = 1000;
   private final int MAX_ZONES = 32;
   
@@ -24,7 +30,7 @@ public class Controller {
   // It's a identifier for each town/village in AEMET opendata.
   private int location;
   
-  final GpioController gpio = GpioFactory.getInstance();
+  GpioController gpio = GpioFactory.getInstance();
   
   private Map<Zone, GpioPinDigitalOutput> zonesPin = new HashMap<Zone, GpioPinDigitalOutput>();
   
@@ -45,6 +51,7 @@ public class Controller {
       long timeout = 0;
       if (!zone.isWatering() && (timeout = zone.getSchedule().isTimeForIrrigation(now)) > 0 &&
           Weather.shouldIrrigateNow()) {
+        logger.trace("Starting watering in zone " + zone.getPinAddress());
         activeElectrovalve(zone, timeout*MILLISECONDS);
       }
     }
