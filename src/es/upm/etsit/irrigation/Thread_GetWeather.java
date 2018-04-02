@@ -32,6 +32,10 @@ public class Thread_GetWeather extends Thread {
   }
   
   public void run() {
+    
+    if (location == -1)
+      return;
+    
     Calendar now = GregorianCalendar.getInstance();
     now.setTimeInMillis(System.currentTimeMillis());
     
