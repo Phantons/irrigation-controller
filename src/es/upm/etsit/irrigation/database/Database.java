@@ -223,7 +223,7 @@ public class Database {
         + "(pinAddress, modeID, name, shouldTakeWeather) VALUES (?,?,?,?)");
     preparedStatements.put(DBStatements.MAIN_INS_DAYS, "INSERT INTO `days` "
         + "(zoneID, monday, tuesday, wednesday, thursday, friday, saturday, sunday) VALUES (?,?,?,?,?,?,?,?)");
-    preparedStatements.put(DBStatements.MAIN_INS_SCHEDULES, "INSERT INTO `days` "
+    preparedStatements.put(DBStatements.MAIN_INS_SCHEDULES, "INSERT INTO `schedules` "
         + "(zoneID, startHour, startMinute, timeout) VALUES (?,?,?,?)");
     
     preparedStatements.put(DBStatements.MAIN_DEL_MODE, "DELETE FROM `modes` "
