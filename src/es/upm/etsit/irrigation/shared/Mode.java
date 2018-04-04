@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Mode implements Serializable {
-  private static final long serialVersionUID = 2L;
+  private static final long serialVersionUID = 3L;
   
   
   private transient int ID;
-  private final String name;
+  private String name;
   private List<Zone> zones = new ArrayList<Zone>();
   
   
@@ -30,6 +30,10 @@ public class Mode implements Serializable {
     return name;
   }
 
+  public void setName(String _name) {
+    this.name = _name;
+  }
+
 
   /**
    * @return the zones
@@ -44,5 +48,14 @@ public class Mode implements Serializable {
    */
   public void setZones(List<Zone> zones) {
     this.zones = zones;
+  }
+
+  public void setZone(int nZone, Zone zone) {
+        this.zones.set(nZone, zone);
+
+  }
+
+  public void addZone(Zone zone) {
+    zones.add(zone);
   }
 }

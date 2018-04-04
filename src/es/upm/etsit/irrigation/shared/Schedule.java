@@ -9,7 +9,7 @@ import es.upm.etsit.irrigation.util.DayOfWeek;
 import es.upm.etsit.irrigation.util.Time;
 
 public class Schedule implements Serializable {
-  private static final long serialVersionUID = 2L;
+  private static final long serialVersionUID = 3L;
   
   private boolean[] days = new boolean[DayOfWeek.values().length];
   private List<Time> irrigationCycles = new ArrayList<Time>();
@@ -22,11 +22,11 @@ public class Schedule implements Serializable {
   
   public long isTimeForIrrigation(Calendar now) {
     int today = now.get(Calendar.DAY_OF_WEEK);
-    int hour = now.get(Calendar.HOUR);
+    int hour = now.get(Calendar.HOUR_OF_DAY);
     int minute = now.get(Calendar.MINUTE);
     
     for (Time irrigationCycle : irrigationCycles) {
-      if (irrigationCycle.isBetween(hour, minute) && isDaySelected(today)) {
+      if (irrigationCycle.isBetween(hour, minute) && isDaySelected(today-1)) {
         return irrigationCycle.getTimeout();
       }
     }
@@ -47,5 +47,9 @@ public class Schedule implements Serializable {
   
   public List<Time> getIrrigationCycles() {
     return irrigationCycles;
+  }
+
+  public boolean[] getDays() {
+    return this.days;
   }
 }

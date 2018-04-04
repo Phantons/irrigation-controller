@@ -3,7 +3,7 @@ package es.upm.etsit.irrigation.util;
 import java.io.Serializable;
 
 public class Time implements Serializable {
-  private static final long serialVersionUID = 2L;
+  private static final long serialVersionUID = 3L;
   
   private final LocalTime start;
   private final long timeoutInSeconds;
@@ -20,7 +20,7 @@ public class Time implements Serializable {
     
     LocalTime now = LocalTime.of(hour, minute);
     
-    return now.isBefore(end) && now.isAfter(start);
+    return now.isBefore(end) && (now.isAfter(start) || now.equals(start));
   }
   
   public LocalTime getStart() {

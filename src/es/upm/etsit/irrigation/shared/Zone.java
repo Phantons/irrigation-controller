@@ -3,7 +3,7 @@ package es.upm.etsit.irrigation.shared;
 import java.io.Serializable;
 
 public class Zone implements Serializable {
-  private static final long serialVersionUID = 2L;
+  private static final long serialVersionUID = 3L;
   
   private final String name;
   private final int pinAddress;

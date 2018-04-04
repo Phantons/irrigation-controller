@@ -9,10 +9,9 @@ import java.io.Serializable;
  * Created by cano0 on 10/03/2018.
  */
 
-public class Controlador implements Serializable{
+public class Controlador implements Serializable {
+    private static final long serialVersionUID = 3L;
 
-    private static final long serialVersionUID = 2L;
-  
     private String titulo = "";
     private String id = "";
     private boolean tiempar = false;
@@ -28,6 +27,7 @@ public class Controlador implements Serializable{
         this.active_mode = active_mode;
         this.list_mode = list_modo;
     }
+
     public String getTitulo() {
         return titulo;
     }
