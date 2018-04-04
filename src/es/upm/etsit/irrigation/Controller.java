@@ -23,7 +23,7 @@ public class Controller {
   private final Logger logger = LogManager.getLogger(this.getClass().getName());
   
   private final long MILLISECONDS = 1000;
-  private final int MAX_ZONES = 32;
+  public static final int MAX_ZONES = 32;
   
   private Mode mode;
   
@@ -35,7 +35,7 @@ public class Controller {
   private Map<Zone, GpioPinDigitalOutput> zonesPin = new HashMap<Zone, GpioPinDigitalOutput>();
   
   public Controller(Mode _mode) {
-    setNewActiveMode(_mode);
+    loadingMode(_mode);
     location = -1;
   }
   
@@ -49,8 +49,8 @@ public class Controller {
     
     for (Zone zone : mode.getZones()) {
       long timeout = 0;
-      if (!zone.isWatering() && (timeout = zone.getSchedule().isTimeForIrrigation(now)) > 0 &&
-          Weather.shouldIrrigateNow()) {
+      if (!zone.isWatering() && (timeout = zone.getSchedule().isTimeForIrrigation(now)) > 0 /*&&
+          Weather.shouldIrrigateNow()*/) {
         logger.trace("Starting watering in zone " + zone.getPinAddress());
         activeElectrovalve(zone, timeout*MILLISECONDS);
       }
@@ -74,6 +74,7 @@ public class Controller {
   
   public void activeElectrovalve(Zone zone, long timeout) {
     if (zonesPin.get(zone) == null) {
+      logger.error("This shouldn't happen");
       makePin(zone);
     }
     
@@ -92,7 +93,14 @@ public class Controller {
     
     DataMgr.removeMode(mode);
     
-    mode = newMode;
+    loadingMode(newMode);
+      
+    if (newMode != null)
+      DataMgr.addModeToDB(newMode); 
+  }
+  
+  private void loadingMode(Mode newMode) {
+   mode = newMode;
     
     if (newMode != null) {
       // Make pins for zones.
@@ -112,11 +120,11 @@ public class Controller {
             setNewActiveMode(newMode);
           }
           
-        } else
+        } else {
+          logger.debug("The first time we launch this pin");
           makePin(zone);
+        }
       }
-      
-      DataMgr.addModeToDB(newMode); 
     }
   }
   

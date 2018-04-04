@@ -14,7 +14,6 @@ import es.upm.etsit.irrigation.shared.Schedule;
 import es.upm.etsit.irrigation.shared.Zone;
 import es.upm.etsit.irrigation.util.DayOfWeek;
 import es.upm.etsit.irrigation.util.Time;
-import es.upm.etsit.irrigation.util.Util;
 
 public class DataMgr {
   private static final Logger logger = LogManager.getLogger(DataMgr.class.getName());
@@ -82,7 +81,7 @@ public class DataMgr {
       return;
     
     logger.trace("Removing mode [{}]", mode.getName());
-    Util.printMode(mode);
+   // Util.printMode(mode);
     
     Connection conn = null;
     try {
@@ -101,6 +100,7 @@ public class DataMgr {
       
       // Then delete all zones for the mode.
       stmt = conn.prepareStatement(Database.getPreparedStatement(DBStatements.MAIN_DEL_ZONES_BY_MODE_ID));
+      logger.debug("Removing data. Mode [{}]", mode.getID());
       stmt.setInt(1, mode.getID());
       stmt.executeUpdate(); 
       

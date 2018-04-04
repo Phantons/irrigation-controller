@@ -21,7 +21,6 @@ import es.upm.etsit.irrigation.socket.SocketHandler;
 import es.upm.etsit.irrigation.util.DayOfWeek;
 import es.upm.etsit.irrigation.util.LocalTime;
 import es.upm.etsit.irrigation.util.Time;
-import es.upm.etsit.irrigation.util.Util;
 
 public class Main {
   
@@ -94,7 +93,7 @@ public class Main {
           logger.trace("Added new controller");
           
           // DEBUG
-          Util.printMode(newController.getActiveMode());
+         //  Util.printMode(newController.getActiveMode());
           
           controller.setNewActiveMode(newController.getActiveMode());
           // controller.setLocation(newController.getMunicipio());
@@ -105,7 +104,10 @@ public class Main {
         for (int i = 0; i < portIrrigationTimes.length; i++) {
           Integer time = portIrrigationTimes[i];
           if (time != null && time > 0) {
-            controller.activeElectrovalve(controller.getZoneByPinAddress(i), time);
+            if (controller.getZoneByPinAddress(i) != null)
+              controller.activeElectrovalve(controller.getZoneByPinAddress(i), time);
+            else
+              logger.error("User wants us to irrigate a zone we don't have");
           }
         }
         
@@ -174,9 +176,9 @@ public class Main {
        result2.next();
        
        boolean[] days = new boolean[DayOfWeek.values().length];
-       for (int i = 0; i < DayOfWeek.values().length; i++) {
-         days[i] = result2.getBoolean(i);
-         logger.trace("Day [{}] is {}", DayOfWeek.getFromID(i), days[i]);
+       for (int i = 1; i < DayOfWeek.values().length + 1; i++) {
+         days[i-1] = result2.getBoolean(i);
+         logger.trace("Day [{}] is {}", DayOfWeek.getFromID(i-1), days[i-1]);
        }
        
        stmt2 = conn.prepareStatement(Database.getPreparedStatement(DBStatements.MAIN_SEL_SCHEDULES_BY_ZONE_ID));

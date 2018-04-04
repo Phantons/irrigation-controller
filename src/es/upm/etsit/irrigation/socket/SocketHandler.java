@@ -8,6 +8,7 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import es.upm.etsit.irrigation.Controller;
 import es.upm.etsit.irrigation.shared.Controlador;
 
 public class SocketHandler {
@@ -47,9 +48,9 @@ public class SocketHandler {
     	if(respuesta.equals("IdFalso")){
     		return new Integer[0];
     	}
-    	Integer[] salida = new Integer[32];
+    	Integer[] salida = new Integer[Controller.MAX_ZONES];
     	String[] separados = respuesta.substring(1, respuesta.length() - 1).split("/");
-    	for(int j1 = 0; j1 < 32; j1 = j1 + 1){
+    	for(int j1 = 0; j1 < Controller.MAX_ZONES; j1 = j1 + 1){
     		if(separados[j1].equals("null") == false){
     			salida[j1] = Integer.parseInt(separados[j1]);
     		}
