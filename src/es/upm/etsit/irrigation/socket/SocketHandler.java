@@ -16,7 +16,13 @@ public class SocketHandler {
 
   
   public static Controlador askController(String identificador) {
-    String respuesta = Comunicaciones.consultarAlServidor("/AskCo/" + identificador + "/", 1)[0];
+    
+    String[] array = Comunicaciones.consultarAlServidor("/AskCo/" + identificador + "/", 1);
+    String respuesta = null;
+    
+    if (array != null)
+     respuesta = array[0];
+    
     if(respuesta != null) {
     	if(respuesta.equals("IdFalso")) {
     		return null;
