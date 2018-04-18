@@ -30,7 +30,7 @@ public class Main {
   private final static long WAITING_TIME = 1000;
   
   // 1 min
-  private final static long UPDATE_TIME = 60000;
+  private final static long UPDATE_TIME = 5000;
   private static long updateTime = 0;
   
   // 15 minutes
@@ -42,6 +42,7 @@ public class Main {
   private static long weatherTime = 0;
   
   private static Controller controller;
+  private static Controlador otroControlador;
   
   private static final String USER = "ELCO";
   private static final String PASSWORD = "ELCO";
@@ -82,28 +83,33 @@ public class Main {
     
     controller = new Controller(mode);
     
-    // loop
     while (true) {
       logger.trace("Working...");
       
       if (System.currentTimeMillis() > updateTime) {
         // Ask new mode if exists.
         Controlador newController = SocketHandler.askController(RASPI_ID);
-        if (newController != null) {
+        
+        if (newController != null && newController.getVersion() > otroControlador.getVersion()) {
           logger.trace("Added new controller");
           
           // DEBUG
          //  Util.printMode(newController.getActiveMode());
           
           controller.setNewActiveMode(newController.getActiveMode());
-          // controller.setLocation(newController.getMunicipio());
+          controller.setLocation(Integer.parseInt(newController.getMunicipio()));
+          
+          otroControlador = newController;
         }
         
         // Ask if some zone should irrigate now
         Integer[] portIrrigationTimes = SocketHandler.shouldIrrigateNow(RASPI_ID);
+        
         for (int i = 0; i < portIrrigationTimes.length; i++) {
           Integer time = portIrrigationTimes[i];
           if (time != null && time > 0) {
+            time *= 60 * 1000;
+            logger.info("Activated port [{}] for [{}]", i, time);
             if (controller.getZoneByPinAddress(i) != null)
               controller.activeElectrovalve(controller.getZoneByPinAddress(i), time);
             else

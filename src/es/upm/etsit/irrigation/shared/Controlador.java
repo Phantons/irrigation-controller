@@ -1,7 +1,6 @@
 package es.upm.etsit.irrigation.shared;
 
 import java.util.List;
-
 import java.io.Serializable;
 
 
@@ -12,6 +11,7 @@ import java.io.Serializable;
 public class Controlador implements Serializable {
     private static final long serialVersionUID = 3L;
 
+    private int version;
     private String titulo = "";
     private String id = "";
     private boolean tiempar = false;
@@ -20,12 +20,14 @@ public class Controlador implements Serializable {
     private List<Mode> list_mode;
 
     public Controlador(String titulo, String id, boolean tiempar, String municipio, Mode active_mode, List<Mode> list_modo) {
+        
         this.titulo = titulo;
         this.id = id;
         this.tiempar = tiempar;
         this.municipio = municipio;
         this.active_mode = active_mode;
         this.list_mode = list_modo;
+        this.version = 0;
     }
 
     public String getTitulo() {
@@ -59,4 +61,11 @@ public class Controlador implements Serializable {
     }
 
     public void addMode(Mode newMode) { list_mode.add(newMode); }
+    
+    
+    public int getVersion() { return this.version; }
+     
+    
+    public void update() { this.version++; }
+    
 }
