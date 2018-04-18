@@ -10,10 +10,13 @@ public class Zone implements Serializable {
   private Schedule schedule;
   private boolean shouldTakeWeather = false;
   private boolean isWatering = false;
+  private Sensor mySensor;
+  
   
   public Zone(String _name, int _pinAddress) {
     name = _name;
     pinAddress = _pinAddress;
+    mySensor = null;
   }
 
   public String getName() {
@@ -52,5 +55,13 @@ public class Zone implements Serializable {
    */
   public void setWatering(boolean isActive) {
     this.isWatering = isActive;
+  }
+  
+  public Sensor getMySensor() {
+    return mySensor;
+  }
+  
+  public void setMySensor(Sensor _sensor) {
+    mySensor = _sensor;
   }
 }
