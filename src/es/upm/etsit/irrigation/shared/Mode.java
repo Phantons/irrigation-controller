@@ -8,7 +8,7 @@ public class Mode implements Serializable {
   private static final long serialVersionUID = 3L;
   
   
-  private transient int ID;
+  private int ID;
   private String name;
   private List<Zone> zones = new ArrayList<Zone>();
   

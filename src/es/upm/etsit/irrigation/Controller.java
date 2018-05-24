@@ -1,5 +1,6 @@
 package es.upm.etsit.irrigation;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -14,9 +15,21 @@ import com.pi4j.io.gpio.GpioPin;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
+import com.pi4j.io.gpio.exception.UnsupportedBoardType;
+import com.pi4j.io.serial.Baud;
+import com.pi4j.io.serial.DataBits;
+import com.pi4j.io.serial.FlowControl;
+import com.pi4j.io.serial.Parity;
+import com.pi4j.io.serial.Serial;
+import com.pi4j.io.serial.SerialConfig;
+import com.pi4j.io.serial.SerialDataEvent;
+import com.pi4j.io.serial.SerialDataEventListener;
+import com.pi4j.io.serial.SerialFactory;
+import com.pi4j.io.serial.StopBits;
 
 import es.upm.etsit.irrigation.database.DataMgr;
 import es.upm.etsit.irrigation.shared.Mode;
+import es.upm.etsit.irrigation.shared.Sensor;
 import es.upm.etsit.irrigation.shared.Zone;
 
 public class Controller {
@@ -30,13 +43,104 @@ public class Controller {
   // It's a identifier for each town/village in AEMET opendata.
   private int location;
   
-  GpioController gpio = GpioFactory.getInstance();
+  private GpioController gpio = GpioFactory.getInstance();
+  private Serial serial = null;
+
   
   private Map<Zone, GpioPinDigitalOutput> zonesPin = new HashMap<Zone, GpioPinDigitalOutput>();
   
   public Controller(Mode _mode) {
     loadingMode(_mode);
     location = -1;
+    
+    initSensorConnection();
+  }
+  
+  
+  private void initSensorConnection() {
+    serial = SerialFactory.createInstance();
+    
+    serial.addListener(new SerialDataEventListener() {
+      @Override
+      public void dataReceived(SerialDataEvent event) {
+        
+        try {
+          String data = event.getAsciiString();
+          String[] dataSplitted = data.split("\\-");
+          
+          if (dataSplitted.length == 2) {
+            int ID = -1;
+            
+            try {
+             ID = Integer.parseInt(dataSplitted[0]); 
+            } catch(NumberFormatException e) {
+              logger.error("Error getting ID [{}], data [{}]", dataSplitted[0], data);
+            }
+            
+            String info = dataSplitted[1];
+            
+            logger.info("Getting data [{}] and id [{}] and info [{}]", data, ID, info);
+            for (Zone zone : mode.getZones()) {
+              Sensor sensor = zone.getMySensor();
+              
+              if (sensor != null && sensor.getID() == ID) {
+                
+                String[] infoSplitted = info.split("/");
+                
+                if (infoSplitted.length == 3) {
+                  double groundHumidity;
+                  double humidity;
+                  double temperature;
+                  
+                  try {
+                    groundHumidity = Double.parseDouble(infoSplitted[0]);
+                    humidity = Double.parseDouble(infoSplitted[1]);
+                    temperature = Double.parseDouble(infoSplitted[2]);
+                    
+                    sensor.setGroundHumidity(groundHumidity);
+                    sensor.setHumidity(humidity);
+                    sensor.setTemperature(temperature);
+                    
+                  } catch(NumberFormatException e) {
+                    logger.error("Error parsing info", info, data);
+                  }
+                } else {
+                  logger.error("Error getting info [{}], data [{}]", info, data);
+                }
+                
+                break;
+              }
+            }
+            
+          } else {
+            logger.error("Error getting data [{}]", data);
+          }
+          
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+        
+        
+      }
+    });
+    
+    // create serial config object
+    SerialConfig config = new SerialConfig();
+
+    // set default serial settings (device, baud rate, flow control, etc)
+    try {
+      config.device("/dev/serial0")
+            .baud(Baud._9600)
+            .dataBits(DataBits._8)
+            .parity(Parity.NONE)
+            .stopBits(StopBits._1)
+            .flowControl(FlowControl.NONE);
+      
+      // open the default serial device/port with the configuration settings
+      serial.open(config);
+    } catch (UnsupportedBoardType | IOException e) {
+      e.printStackTrace();
+    }
   }
   
   public void checkAndStartIrrigationCycles() {
@@ -160,4 +264,10 @@ public class Controller {
   public void setLocation(int location) {
     this.location = location;
   }
+  
+  
+  public Serial getSerial() {
+    return serial;
+  }
+  
 }

@@ -33,6 +33,8 @@ public class Thread_GetWeather extends Thread {
   
   public void run() {
     
+    System.out.println("Location is " + location);
+    
     if (location == -1)
       return;
     
@@ -71,8 +73,6 @@ public class Thread_GetWeather extends Thread {
         }
         
         if (todayCal.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH)) {
-          logger.debug("Today:");
-          logger.debug(todayJSON);
           isToday = true;
         } else
           dayIterator++;
@@ -97,7 +97,7 @@ public class Thread_GetWeather extends Thread {
       Weather.setRelativeHumidity(currentRelativeHumidity);
 
       
-      
+      logger.debug("Url of data " + dataURL);
       logger.debug("Temperatura: " + currentTemperature);
       logger.debug("Humedad Relativa: " + currentRelativeHumidity);
       logger.debug("Humedad probPrecipitacion: " + chanceOfPrecipitationNextHours);

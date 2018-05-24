@@ -30,7 +30,7 @@ public class Main {
   private final static long WAITING_TIME = 1000;
   
   // 1 min
-  private final static long UPDATE_TIME = 5000;
+  private final static long UPDATE_TIME = 1000;
   private static long updateTime = 0;
   
   // 15 minutes
@@ -90,14 +90,23 @@ public class Main {
         // Ask new mode if exists.
         Controlador newController = SocketHandler.askController(RASPI_ID);
         
-        if (newController != null && newController.getVersion() > otroControlador.getVersion()) {
+        if (otroControlador == null ||(newController != null && newController.getVersion() > otroControlador.getVersion())) {
           logger.trace("Added new controller");
           
           // DEBUG
          //  Util.printMode(newController.getActiveMode());
           
           controller.setNewActiveMode(newController.getActiveMode());
-          controller.setLocation(Integer.parseInt(newController.getMunicipio()));
+          
+          int location = -1;
+          
+          try {
+            location = Integer.parseInt(newController.getMunicipio());
+          } catch (NumberFormatException e) {
+            logger.error("Error getting controller", e);
+          }
+          
+          controller.setLocation(location);
           
           otroControlador = newController;
         }
@@ -124,6 +133,7 @@ public class Main {
       }
       
       if (System.currentTimeMillis() > weatherTime) {
+        logger.trace("Launching get weeather");
         Thread thread = new Thread_GetWeather(controller.getLocation());
         thread.start();
         
